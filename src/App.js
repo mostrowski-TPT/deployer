@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,9 +8,10 @@ class Dropdowna extends Component {
   constructor(props) {
     super(props);
     this.toggle = this.toggle.bind(this);
+    this.select = this.select.bind(this)
     this.state = {
       dropdownOpen: false,
-      picked: null
+      value: 'Male'
     };
   }
 
@@ -21,16 +21,26 @@ class Dropdowna extends Component {
     });
   }
 
+  select(event) {
+    if (event.target.innerText === this.state.value)
+      return;
+    this.setState({
+      dropdownOpen: !this.state.dropdownOpen,
+      value: event.target.innerText
+    });
+    this.props.setSex()
+  }
+
   render() {
     return (
       <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle caret>
-          {this.props.sex}
+          {this.state.value}
         </DropdownToggle>
         <DropdownMenu>
-          <DropdownItem onClick={()=>this.props.setSex("Male")}>Male</DropdownItem>
+          <DropdownItem onClick={this.select}>Male</DropdownItem>
           <DropdownItem divider />
-          <DropdownItem onClick={()=>this.props.setSex("Female")}>Female</DropdownItem>
+          <DropdownItem onClick={this.select}>Female</DropdownItem>
         </DropdownMenu>
       </ButtonDropdown>
     );
@@ -47,7 +57,7 @@ class Calc extends Component {
       fieldone: 0,
       submit: false,
       inputdone: false,
-      sex: "male"
+      sex: true
     }
   
     this.handleChange = this.handleChange.bind(this);
@@ -75,11 +85,17 @@ calculateMale(age, chest, stomach, thigh){
 }
 
 calculateFemale(age, tricep, hips, thigh){
-  return "FEMALE";
+  return (457 / (1.099421 - (0.0009929 * (tricep+hips+thigh)) + (0.0000023 * ((tricep+hips+thigh)**2)) - (0.0001392 * age))) - 414.2; 
 }
 
-setSex(sex){
-  this.setState({sex: sex});
+setSex(){
+  this.setState({sex: !this.state.sex,
+    age: 0,
+      fieldtwo: 0,
+      fieldthree: 0,
+      fieldone: 0,
+      submit: false
+  });
 }
 
   render(){
@@ -87,23 +103,23 @@ setSex(sex){
     let submit = this.state.submit;
     let inputdone =  check.find(e => e === '' || e === 0) !== undefined ? false : true;
     return(
-<div className="container">
-
+      <div>
+      <div className="container">
       <div className="row">
       <div className="col-sm text-center">
       <label className="label">Sex</label>
-<Dropdowna setSex={this.setSex} sex={this.state.sex} />
-</div>
+      <Dropdowna setSex={this.setSex} sex={this.state.sex} />
+      </div>
       <div className="col-sm text-center">
       <label className="label">Age</label>
       <input name="age" min="0" value={this.state.age} className="input" type="number" onChange={this.handleChange}></input>
       </div>
       <div className="col-sm text-center">
-      <label className="label">Chest (mm)</label>
+      <label className="label">{(this.state.sex)? "Chest (mm)":"Triceps (mm)"}</label>
       <input name="fieldone" className="input" min="0" value={this.state.fieldone} type="number" onChange={this.handleChange}></input>
       </div>
       <div className="col-sm text-center">
-      <label className="label">Stomach (mm)</label>
+      <label className="label">{(this.state.sex)? "Stomach (mm)":"Hips (mm)"}</label>
       <input name="fieldtwo" className="input" min="0" value={this.state.fieldtwo} type="number" onChange={this.handleChange}></input>
       </div>
       <div className="col-sm text-center">
@@ -112,13 +128,14 @@ setSex(sex){
       </div>
       </div>
       {inputdone && !submit && <button className="buttonfat" onClick={this.onSubmit}>Calculate body fat</button>}
-      {submit && <div className="row"><div className="col-sm bodyfat">{"Body fat " + (this.state.sex === "female") ? this.calculateFemale(...check).toFixed(2) : this.calculateMale(...check).toFixed(2) + "%"}</div></div>}
+      {submit && <div className="row"><div className="col-sm bodyfat">{"Body fat " + ((this.state.sex) ? this.calculateFemale(...check).toFixed(2) : this.calculateMale(...check).toFixed(2)) + "%"}</div></div>}
       {!inputdone && <div className="row"><div className="col-sm bodyfat">Please fill all input fields</div></div>}
+      </div>
+      <Info sex={this.state.sex} />
       </div>
     )
   }
 }
-
 
 class Info extends Component {
   constructor(props) {
@@ -143,8 +160,8 @@ return (
 <p>It is based on skinfold measurement method <a target="_blank" rel="noopener noreferrer" href="https://www.ptdirect.com/training-delivery/client-assessment/taking-skin-fold-body-fat-measurements">described here</a>.</p>
 <p>Measurements have to be taken from:</p>
 <ul>
-<li>Your chest area</li>
-<li>Your stomach area</li>  
+<li>{(this.props.sex)? "Your chest area":"Your triceps area"}</li>
+<li>{(this.props.sex)? "Your stomach area":"Your hip area"}</li>  
 <li>Your thigh area</li>    
 </ul> 
 </CardBody>
@@ -170,7 +187,7 @@ return (
 <h1 className="heading">BODY FAT CALCULATOR</h1>
 
       <Calc />
-      <Info />
+      
       </div>
     );
   }
