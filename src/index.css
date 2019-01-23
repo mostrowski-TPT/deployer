@@ -1,8 +1,6 @@
 #root {
-  background-image: linear-gradient(to top, #36D1DC, #5B86E5);
   background-repeat: 'no-repeat';
   background-position: 'center';
-  height: 100%;
   background-size: cover;
   margin: 0;
   -webkit-background-size: cover;
@@ -20,12 +18,11 @@ html {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: linear-gradient(to top, #36D1DC, #5B86E5);
+ background-image: linear-gradient(to top, #36D1DC, #5B86E5);
   background-repeat: 'no-repeat';
   background-position: 'center';
-  height: 100%;
+  
   background-size: cover;
-  margin: 0;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
